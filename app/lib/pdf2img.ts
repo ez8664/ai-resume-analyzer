@@ -1,3 +1,5 @@
+import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+
 export interface PdfConversionResult {
   imageUrl: string;
   file: File | null;
@@ -7,6 +9,7 @@ export interface PdfConversionResult {
 let pdfjsLib: any = null;
 let isLoading = false;
 let loadPromise: Promise<any> | null = null;
+
 
 async function loadPdfJs(): Promise<any> {
   if (pdfjsLib) return pdfjsLib;
@@ -31,6 +34,8 @@ export async function convertPdfToImage(
   try {
     const lib = await loadPdfJs();
 
+    lib.GlobalWorkerOptions.workerSrc = workerSrc;
+
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await lib.getDocument({ data: arrayBuffer }).promise;
     const page = await pdf.getPage(1);
@@ -38,6 +43,9 @@ export async function convertPdfToImage(
     const viewport = page.getViewport({ scale: 4 });
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
+    if (!context) {
+      return { imageUrl: "", file: null, error: "Failed to get 2D canvas context" };
+    }
 
     canvas.width = viewport.width;
     canvas.height = viewport.height;
