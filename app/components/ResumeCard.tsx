@@ -5,7 +5,7 @@ import { usePuterStore } from "~/lib/puter";
 
 const ResumeCard = ({ resume: {id, companyName, jobTitle, feedback, imagePath} }: {resume: Resume}) => {
     const { auth, fs } = usePuterStore();
-    const { resumeUrl, setResumeUrl } =  useState('');
+    const [ resumeUrl, setResumeUrl ] =  useState('');
 
     useEffect( () => {
         const loadResume = async() => {
